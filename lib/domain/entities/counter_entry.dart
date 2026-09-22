@@ -19,6 +19,7 @@ class CounterEntry {
     String? description,
     DateTime? dateTime
   }) => CounterEntry(
+    id: id,
     description: description ?? this.description,
     dateTime: dateTime ?? this.dateTime
   );

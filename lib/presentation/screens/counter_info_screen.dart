@@ -2,7 +2,10 @@
 import 'package:addit/config/helpers/human_formats.dart';
 import 'package:addit/domain/entities/counter.dart';
 import 'package:addit/domain/entities/counter_entry.dart';
+import 'package:addit/presentation/providers/counters/counter_stats_providers.dart';
 import 'package:addit/presentation/providers/counters/counters_provider.dart';
+import 'package:addit/presentation/widgets/stats/counter_bar_chart.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -50,6 +53,8 @@ class _CounterInfoView extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
 
+    final counterEntriesOrdered = [...counter.entries]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
     return SingleChildScrollView(
       child: SizedBox(
         width: double.infinity,
@@ -61,7 +66,22 @@ class _CounterInfoView extends ConsumerWidget {
               const SizedBox(height: 30,),
               _CounterIconAndTitle(size: size, textTheme: textTheme, counter: counter),
               const SizedBox(height: 30,),
-              _SectionTitle(textTheme: textTheme, title: 'Lista de entradas',),
+              _SectionTitle(textTheme: textTheme, title: 'Estadísticas',),
+              const SizedBox(height: 5,),
+              _StatsVisualizer(textTheme: textTheme, counter: counter, ref: ref,),
+              const SizedBox(height: 30,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _SectionTitle(textTheme: textTheme, title: 'Lista de entradas',),
+                  IconButton.filled(
+                    onPressed: () {
+                      ref.read(countersProvider.notifier).increment(counter.id);
+                    }, 
+                    icon: Icon(Icons.add)
+                  )
+                ],
+              ),
               const SizedBox(height: 5,),
       
               Card(
@@ -70,21 +90,24 @@ class _CounterInfoView extends ConsumerWidget {
                   child: ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: counter.entries.length,
+                    itemCount: counterEntriesOrdered.length,
                     separatorBuilder: (context, index) => const Divider(),
                     itemBuilder: (context, index) {
-                      final counterEntry = counter.entries[counter.entries.length - index - 1];
-                      return ListTile(
-                        horizontalTitleGap: 8,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                        visualDensity: const VisualDensity(vertical: -3),
-                        leading: Text(counter.icon, style: textTheme.titleLarge,),
-                        title: _EntryDescription(counterEntry: counterEntry, textTheme: textTheme),
-                        subtitle: Text(HumanFormats.formatDate(counterEntry.dateTime)),
-                        trailing: const Icon(Icons.keyboard_arrow_right, size: 30,),
-                        onTap: () {
-                          _showEditEntrySheet(context, ref, counter, counterEntry);
-                        },
+                      final counterEntry = counterEntriesOrdered[index];
+                      return FadeInRight(
+                        key: ValueKey(counterEntry.id),
+                        child: ListTile(
+                          horizontalTitleGap: 8,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                          visualDensity: const VisualDensity(vertical: -3),
+                          leading: Text(counter.icon, style: textTheme.titleLarge,),
+                          title: _EntryDescription(counterEntry: counterEntry, textTheme: textTheme),
+                          subtitle: Text(HumanFormats.formatDate(counterEntry.dateTime)),
+                          trailing: const Icon(Icons.keyboard_arrow_right, size: 30,),
+                          onTap: () {
+                            _showEditEntrySheet(context, ref, counter, counterEntry);
+                          },
+                        ),
                       );
                     }
                   ),
@@ -137,7 +160,7 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text('Lista de entradas', textAlign: TextAlign.left, style: textTheme.titleLarge,)
+      child: Text(title, textAlign: TextAlign.left, style: textTheme.titleLarge,)
     );
   }
 }
@@ -300,3 +323,45 @@ Future<void> _showEditEntrySheet(BuildContext context, WidgetRef ref, Counter co
 }
 
 
+class _StatsVisualizer extends StatelessWidget {
+
+  final TextTheme textTheme;
+  final Counter counter;
+  final WidgetRef ref;
+
+  const _StatsVisualizer({
+    required this.textTheme,
+    required this.counter,
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final data = ref.watch(weeklyChartDataProvider(counter.id));
+
+    return FadeInRight(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 20, 5, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('PROMEDIO', style: textTheme.labelLarge,),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text('0.3', style: textTheme.displaySmall),
+                  SizedBox(width: 2,),
+                  Text('por día', style: textTheme.labelMedium),
+                ],
+              ),
+              SizedBox(height: 20,),
+              CounterBarChart(weeklyData: data),
+            ],
+          ),
+        )
+      ),
+    );
+  }
+}
