@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   animate_do: ^5.1.0
+  animations: ^3.0.0
   emoji_picker_flutter: ^4.5.4
   fl_chart: ^1.2.0
   flutter:

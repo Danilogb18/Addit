@@ -9,57 +9,6 @@ part of 'counter_stats_providers.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(WeekOffset)
-final weekOffsetProvider = WeekOffsetProvider._();
-
-final class WeekOffsetProvider extends $NotifierProvider<WeekOffset, int> {
-  WeekOffsetProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'weekOffsetProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$weekOffsetHash();
-
-  @$internal
-  @override
-  WeekOffset create() => WeekOffset();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(int value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<int>(value),
-    );
-  }
-}
-
-String _$weekOffsetHash() => r'952c45e76953c60119ceefea3394cfb66568fb65';
-
-abstract class _$WeekOffset extends $Notifier<int> {
-  int build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<int, int>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<int, int>,
-              int,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
-
 @ProviderFor(entries)
 final entriesProvider = EntriesFamily._();
 
@@ -143,17 +92,11 @@ final class EntriesFamily extends $Family
   String toString() => r'entriesProvider';
 }
 
-@ProviderFor(weekRange)
+@ProviderFor(WeekRange)
 final weekRangeProvider = WeekRangeProvider._();
 
 final class WeekRangeProvider
-    extends
-        $FunctionalProvider<
-          DateTimeRange<DateTime>,
-          DateTimeRange<DateTime>,
-          DateTimeRange<DateTime>
-        >
-    with $Provider<DateTimeRange<DateTime>> {
+    extends $NotifierProvider<WeekRange, DateTimeRange<DateTime>> {
   WeekRangeProvider._()
     : super(
         from: null,
@@ -170,14 +113,7 @@ final class WeekRangeProvider
 
   @$internal
   @override
-  $ProviderElement<DateTimeRange<DateTime>> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  DateTimeRange<DateTime> create(Ref ref) {
-    return weekRange(ref);
-  }
+  WeekRange create() => WeekRange();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(DateTimeRange<DateTime> value) {
@@ -188,7 +124,26 @@ final class WeekRangeProvider
   }
 }
 
-String _$weekRangeHash() => r'da3e45fe4cd9a717e769bf837ab2708019a39db6';
+String _$weekRangeHash() => r'9d66a5eca0f85c0aa33036e42531bae6eacce598';
+
+abstract class _$WeekRange extends $Notifier<DateTimeRange<DateTime>> {
+  DateTimeRange<DateTime> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref as $Ref<DateTimeRange<DateTime>, DateTimeRange<DateTime>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<DateTimeRange<DateTime>, DateTimeRange<DateTime>>,
+              DateTimeRange<DateTime>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
 
 @ProviderFor(weeklyChartData)
 final weeklyChartDataProvider = WeeklyChartDataFamily._();
@@ -266,3 +221,44 @@ final class WeeklyChartDataFamily extends $Family
   @override
   String toString() => r'weeklyChartDataProvider';
 }
+
+@ProviderFor(chartLabels)
+final chartLabelsProvider = ChartLabelsProvider._();
+
+final class ChartLabelsProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  ChartLabelsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chartLabelsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chartLabelsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return chartLabels(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$chartLabelsHash() => r'33f564525f03c6090bab4a4fa02bca5dee649a73';

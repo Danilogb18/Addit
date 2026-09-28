@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class CounterBarChart extends StatelessWidget {
-  const CounterBarChart({super.key, required this.weeklyData});
+  const CounterBarChart({
+    super.key, 
+    required this.weeklyData,
+    required this.labels
+  });
 
   // Índice 0 = lunes, ..., 6 = domingo (o el orden que prefieras)
   final List<int> weeklyData;
+  final List<String> labels;
 
 
   double _calculateInterval() {
-  
-  final maxValue = weeklyData.fold(0, (previousValue, element) => previousValue > element ? previousValue : element,);
-  
-  if (maxValue <= 5) return 1;
-  if (maxValue <= 20) return 5;
-  if (maxValue <= 100) return 20;
-  return (maxValue / 5).roundToDouble();
-}
+    final maxValue = weeklyData.fold(0, (previousValue, element) => previousValue > element ? previousValue : element,);
+    
+    if (maxValue <= 5) return 1;
+    if (maxValue <= 20) return 5;
+    if (maxValue <= 100) return 20;
+    return (maxValue / 5).roundToDouble();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +52,28 @@ class CounterBarChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  const days = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-                  return Text(days[value.toInt()]);
+                  // ** Aqui puedo meter la comprobacion, si son 7 dias, mostrar todas las etiquetas, si son mas , decidir, pero se puede hacer aquí.
+                  // * Para de 7-31 dias, mostrar 31 datos. para mas de eso, mostrar agrupacion por semana, para rango de hasta 6 meses.
+                  // * De 6 meses a 3 años, agrupar por mes. 
+                  return Text(labels[value.toInt()]);
                 },
               ),
             ),
             leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, reservedSize: 28, interval: _calculateInterval()),
+              sideTitles: SideTitles(
+                showTitles: true, 
+                reservedSize: 28, 
+                interval: _calculateInterval(),
+                getTitlesWidget: (value, meta) {
+                  // Si el valor no es múltiplo del intervalo, no dibujes nada
+                  if ( value.toInt() % _calculateInterval() != 0) return const SizedBox.shrink();
+                  
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 12),
+                  );
+                },
+              ),
             ),
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -66,5 +85,3 @@ class CounterBarChart extends StatelessWidget {
     );
   }
 }
-
-
