@@ -49,17 +49,17 @@ class CustomTextFormField extends StatelessWidget {
       decoration: InputDecoration(
         
         filled: true,
-        fillColor: Colors.white54,
+        fillColor: colors.surfaceContainerHighest,
         enabledBorder: border,
         focusedBorder: border,
-        errorBorder: border.copyWith(borderSide: BorderSide(color: Colors.red.shade800)),
-        focusedErrorBorder: border.copyWith(borderSide: BorderSide(color: Colors.red.shade800)),
+        errorBorder: border.copyWith(borderSide: BorderSide(color: colors.error)),
+        focusedErrorBorder: border.copyWith(borderSide: BorderSide(color: colors.error)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         isDense: true,
 
         label: label == null ? null : Text(label!),
         hint: hint == null ? null : Text(hint!),
-        error: error == null ? null : Text(error!),
+        error: error == null ? null : Text(error!, style: TextStyle(color: colors.error),),
       ),
     );
   }

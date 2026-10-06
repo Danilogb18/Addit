@@ -145,6 +145,83 @@ abstract class _$WeekRange extends $Notifier<DateTimeRange<DateTime>> {
   }
 }
 
+@ProviderFor(dailyAverage)
+final dailyAverageProvider = DailyAverageFamily._();
+
+final class DailyAverageProvider
+    extends $FunctionalProvider<String, String, String>
+    with $Provider<String> {
+  DailyAverageProvider._({
+    required DailyAverageFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'dailyAverageProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$dailyAverageHash();
+
+  @override
+  String toString() {
+    return r'dailyAverageProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String create(Ref ref) {
+    final argument = this.argument as String;
+    return dailyAverage(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DailyAverageProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$dailyAverageHash() => r'b872a0de349bfda27700683260294f24505611cf';
+
+final class DailyAverageFamily extends $Family
+    with $FunctionalFamilyOverride<String, String> {
+  DailyAverageFamily._()
+    : super(
+        retry: null,
+        name: r'dailyAverageProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  DailyAverageProvider call(String counterId) =>
+      DailyAverageProvider._(argument: counterId, from: this);
+
+  @override
+  String toString() => r'dailyAverageProvider';
+}
+
 @ProviderFor(weeklyChartData)
 final weeklyChartDataProvider = WeeklyChartDataFamily._();
 
@@ -202,7 +279,7 @@ final class WeeklyChartDataProvider
   }
 }
 
-String _$weeklyChartDataHash() => r'f3994f73c7eb70602e331e0ff37812fc75aaa143';
+String _$weeklyChartDataHash() => r'95177926a5aa7376511e25c3bfb2c6c45c3a7c06';
 
 final class WeeklyChartDataFamily extends $Family
     with $FunctionalFamilyOverride<List<int>, String> {
@@ -226,8 +303,8 @@ final class WeeklyChartDataFamily extends $Family
 final chartLabelsProvider = ChartLabelsProvider._();
 
 final class ChartLabelsProvider
-    extends $FunctionalProvider<List<String>, List<String>, List<String>>
-    with $Provider<List<String>> {
+    extends $FunctionalProvider<ChartAxis, ChartAxis, ChartAxis>
+    with $Provider<ChartAxis> {
   ChartLabelsProvider._()
     : super(
         from: null,
@@ -244,21 +321,21 @@ final class ChartLabelsProvider
 
   @$internal
   @override
-  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<ChartAxis> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  List<String> create(Ref ref) {
+  ChartAxis create(Ref ref) {
     return chartLabels(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<String> value) {
+  Override overrideWithValue(ChartAxis value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<String>>(value),
+      providerOverride: $SyncValueProvider<ChartAxis>(value),
     );
   }
 }
 
-String _$chartLabelsHash() => r'33f564525f03c6090bab4a4fa02bca5dee649a73';
+String _$chartLabelsHash() => r'418b2efa07d2518a960c8b633cd343bf1e0fe9ac';

@@ -4,6 +4,16 @@ import 'package:addit/domain/datasources/counters_datasource.dart';
 import 'package:addit/domain/entities/counter.dart';
 import 'package:addit/domain/entities/counter_entry.dart';
 
+List<CounterEntry> generateEntries () {
+  DateTime lastDate = DateTime.now();
+
+  final newEntries = List.generate(50, (index) {
+    lastDate = lastDate.add(const Duration(days: 1));
+    return CounterEntry(dateTime: lastDate);
+  });
+  return newEntries;
+}
+
 
 List<Counter> mockupCounterList = [
   Counter(
@@ -11,6 +21,7 @@ List<Counter> mockupCounterList = [
     icon: '🍔​',
     entries: [
       CounterEntry(dateTime: DateTime.now(), description: 'Karfels, karfels'),
+      ...generateEntries()
     ]
   )
 ];
