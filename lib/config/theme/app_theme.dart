@@ -12,8 +12,9 @@ class AppTheme {
   ThemeData getTheme () => ThemeData(
     colorScheme: colorScheme,
     appBarTheme: const AppBarTheme(
-      //scrolledUnderElevation: 0,
-      //surfaceTintColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
     ),
     cardTheme: CardThemeData(
       //color: colorScheme.surface,
