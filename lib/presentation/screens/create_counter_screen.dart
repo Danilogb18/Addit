@@ -85,22 +85,49 @@ class _IconDisplay extends StatelessWidget {
   final WidgetRef ref;
 
   void _openEmojiPicker(BuildContext context) {
+
+    final colors = Theme.of(context).colorScheme;
+    final scaffoldColor = Theme.of(context).scaffoldBackgroundColor;
+
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return SizedBox(
-          height: 1000,
-          child: SafeArea(
-            child: EmojiPicker(
-              onEmojiSelected: (category, emoji) {
-                ref.read(createCounterStateProviderProvider.notifier).iconChanged(emoji.emoji);
-                Navigator.pop(context); // cierra el bottom sheet
-              },
-              config: const Config(
-                height: 1000,
-                emojiViewConfig: EmojiViewConfig(
-                  columns: 7,
-                  emojiSizeMax: 28,
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Container(
+            decoration: BoxDecoration(
+              color: scaffoldColor
+            ),
+            child: SafeArea(
+              child: EmojiPicker(
+                onEmojiSelected: (category, emoji) {
+                  ref.read(createCounterStateProviderProvider.notifier).iconChanged(emoji.emoji);
+                  Navigator.pop(context); // cierra el bottom sheet
+                },
+                config: Config(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  emojiViewConfig: EmojiViewConfig(
+                    columns: 7,
+                    emojiSizeMax: 28,
+                    backgroundColor: scaffoldColor,
+                    
+                  ),
+                  searchViewConfig: SearchViewConfig(
+                    backgroundColor: scaffoldColor,
+                    buttonIconColor: colors.primary
+                  ),
+                  bottomActionBarConfig: BottomActionBarConfig(
+                    backgroundColor: scaffoldColor,
+                    buttonColor: colors.primary,
+                    buttonIconColor: colors.onPrimary
+                  ),
+                  categoryViewConfig: CategoryViewConfig(
+                    backgroundColor: colors.surfaceBright,
+                    iconColor: colors.onSurface,
+                    iconColorSelected: colors.primary,
+                    indicatorColor: colors.primary,
+                  ),
+
                 ),
               ),
             ),
@@ -114,6 +141,7 @@ class _IconDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final icon = ref.watch(createCounterStateProviderProvider).icon;
+    final colors = Theme.of(context).colorScheme;
 
     return Column(
       children: [
@@ -130,7 +158,8 @@ class _IconDisplay extends StatelessWidget {
               onTap: () => _openEmojiPicker(context),
               child: CircleAvatar(
                 radius: 50, 
-                backgroundColor: Colors.white,
+                backgroundColor: colors.surfaceBright,
+
                 child: Text(icon, style: textTheme.displayLarge,), 
               ),
             )

@@ -28,6 +28,7 @@ class HumanFormats {
 
     final sameYear = start.year == end.year;
     final sameMonth = sameYear && start.month == end.month;
+    final sameDay = sameYear && sameMonth && start.day == end.day;
 
     final startDay = dayFormat.format(start);
     final endDay = dayFormat.format(end);
@@ -35,6 +36,24 @@ class HumanFormats {
     final endMonth = _cleanMonth(monthFormat.format(end));
     final startYear = yearFormat.format(start);
     final endYear = yearFormat.format(end);
+
+    if (sameDay) { //Un metodo simple para devolver la fecha sola si el inicio es lo mismo que el final
+      return '$startDay de $startMonth de $startYear';
+    }
+
+    // Rangos de meses completos: se omiten los días
+    if (_isFullMonth(range)) {
+      if (sameMonth) {
+        // sept de 2026
+        return '$startMonth $startYear';
+      }
+      if (sameYear) {
+        // ene-mar de 2026
+        return '$startMonth-$endMonth de $endYear';
+      }
+      // nov de 2025-feb de 2026
+      return '$startMonth de $startYear-$endMonth de $endYear';
+    }
 
     if (sameMonth) {
       // 24-30 de sept del 2026
@@ -46,11 +65,18 @@ class HumanFormats {
       return '$startDay de $startMonth-$endDay de $endMonth del $endYear';
     }
 
+
     // 24 de dic del 2025-3 de ene del 2026
-    return '$startDay de $startMonth del $startYear-$endDay de $endMonth del $endYear';
+    //return '$startDay de $startMonth del $startYear-$endDay de $endMonth del $endYear';
+    return '$startDay de $startMonth-$endDay de $endMonth del $endYear';
   }
 
   // intl en español devuelve las abreviaciones con punto ("sept.", "ene.")
   // si prefieres sin punto para que calce con tu formato de ejemplo, lo quitamos:
   static String _cleanMonth(String month) => month.replaceAll('.', '');
+  static bool _isFullMonth(DateTimeRange bucket) {
+    final dayAfterEnd = DateTime(bucket.end.year, bucket.end.month, bucket.end.day + 1);
+    return bucket.start.day == 1 && dayAfterEnd.day == 1;
+  }
+
 }

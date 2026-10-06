@@ -2,11 +2,10 @@
 import 'package:addit/config/helpers/human_formats.dart';
 import 'package:addit/domain/entities/counter.dart';
 import 'package:addit/domain/entities/counter_entry.dart';
-import 'package:addit/presentation/providers/counters/counter_stats_providers.dart';
 import 'package:addit/presentation/providers/counters/counters_provider.dart';
-import 'package:addit/presentation/widgets/stats/counter_bar_chart.dart';
+import 'package:addit/presentation/screens/counter_info/stats_visualizer.dart';
+import 'package:addit/presentation/widgets/widgets.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,7 +27,8 @@ class CounterInfoScreen extends ConsumerWidget {
       data: (data) {
         final counter = data.firstWhere((element) => element.id == id,);
         return Scaffold(
-          appBar: AppBar(title: const Text('Información'),),
+          extendBodyBehindAppBar: true,
+          appBar: const CustomAppBar(title: 'Información'),
           body: _CounterInfoView(counter: counter,),
         );
       },
@@ -57,6 +57,9 @@ class _CounterInfoView extends ConsumerWidget {
     final counterEntriesOrdered = [...counter.entries]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
     return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        top:  MediaQuery.of(context).padding.top, //para no ocultar el contenido por detras del appbar degradado
+      ),
       child: SizedBox(
         width: double.infinity,
         child: Padding(
@@ -69,7 +72,7 @@ class _CounterInfoView extends ConsumerWidget {
               const SizedBox(height: 30,),
               _SectionTitle(textTheme: textTheme, title: 'Estadísticas',),
               const SizedBox(height: 5,),
-              _StatsVisualizer(textTheme: textTheme, counter: counter, ref: ref,),
+              StatsVisualizer(textTheme: textTheme, counter: counter, ref: ref,),
               const SizedBox(height: 30,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,14 +140,17 @@ class _EntryDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final colors = Theme.of(context).colorScheme;
+
     return Text(
       counterEntry.description.trim() == ''
         ? 'Sin descripción'
         : counterEntry.description
       , 
       style: counterEntry.description.trim() == ''
-        ? textTheme.bodyMedium?.copyWith(color: Colors.black54)
-        : textTheme.bodyMedium?.copyWith(color: Colors.black87)
+        ? textTheme.bodyMedium?.copyWith(color: colors.outline)
+        : textTheme.bodyMedium?.copyWith(color: colors.onSurface)
     );
   }
 }
@@ -182,6 +188,9 @@ class _CounterIconAndTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final colors = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: size.width * 0.75,
       child: Row(
@@ -191,12 +200,12 @@ class _CounterIconAndTitle extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.black12,
+                color: colors.outline.withAlpha(150),
               )
             ),
             child: CircleAvatar(
               radius: 50, 
-              backgroundColor: Colors.white,
+              backgroundColor: colors.surfaceBright,
               child: Text(counter.icon , style: textTheme.displayLarge,), 
             )
           ),
@@ -209,7 +218,7 @@ class _CounterIconAndTitle extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(counter.name, style: textTheme.headlineSmall,),
-                Text('Total hasta la fecha: ${counter.count}', style: textTheme.bodyMedium?.copyWith(color: Colors.black54),)
+                Text('Total hasta la fecha: ${counter.count}', style: textTheme.bodyMedium?.copyWith(color: colors.outline),)
               ],
             ),
           )
@@ -325,135 +334,3 @@ Future<void> _showEditEntrySheet(BuildContext context, WidgetRef ref, Counter co
 }
 
 
-class _StatsVisualizer extends StatelessWidget {
-
-  final TextTheme textTheme;
-  final Counter counter;
-  final WidgetRef ref;
-
-  const _StatsVisualizer({
-    required this.textTheme,
-    required this.counter,
-    required this.ref,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final data = ref.watch(weeklyChartDataProvider(counter.id));
-    final dateRange = ref.watch(weekRangeProvider);
-    final average = data.reduce((a,b) => a+b) / data.length;
-    final averageStr = average.toString().substring(0, 3);
-
-    final bool isDataInWeek = data.any((element) => element > 0,); // Si hay algun elemento mayor que cero, hay data
-
-    bool isForward = ref.watch(weekRangeProvider.notifier).isForward;
-    //final String dateRangeString = '${HumanFormats.formatDateToDDMMYY(dateRange.start)} - ${HumanFormats.formatDateToDDMMYY(dateRange.end)}';
-    final String dateRangeString = HumanFormats.formatDateRange(dateRange);
-    return FadeInRight(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 20, 5, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('PROMEDIO', style: textTheme.labelLarge,),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(averageStr, style: textTheme.displaySmall),
-                  const SizedBox(width: 2,),
-                  Text('por día', style: textTheme.labelMedium),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  DateRangeText(dateRangeString: dateRangeString, textTheme: textTheme, isForward: isForward,),
-                  SizedBox(height: 30, width: 20, child: IconButton(onPressed: () {_selectRange(context, ref);}, icon: const Icon(Icons.edit), iconSize: 15,)),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      isForward = false;
-                      ref.read(weekRangeProvider.notifier).previous();
-                    }, 
-                    icon: const Icon(Icons.arrow_left_outlined)
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      isForward = true;
-                      ref.read(weekRangeProvider.notifier).next();
-                    }, 
-                    icon: const Icon(Icons.arrow_right_outlined)
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15,),
-              isDataInWeek
-                ? CounterBarChart(weeklyData: data, labels: ref.watch(chartLabelsProvider),)
-                : const SizedBox(height: 200, child: Center(child: Text('No hay datos para este período de tiempo.'),)), // El height es 200 porque es el mismo que el del barchart
-              const SizedBox(height: 5,),
-            ],
-          ),
-        )
-      ),
-    );
-  }
-}
-
-class DateRangeText extends StatelessWidget {
-
-  final bool isForward;
-
-  const new({
-    super.key,
-    required this.dateRangeString,
-    required this.textTheme,
-    required this.isForward
-  });
-
-  final String dateRangeString;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      child: PageTransitionSwitcher(
-        duration: const Duration(milliseconds: 200),
-        reverse: !isForward,
-        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1, 0),
-              end: Offset.zero,
-            ).animate(primaryAnimation),
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset.zero,
-                end: const Offset(-1, 0),
-              ).animate(secondaryAnimation),
-              child: child,
-            ),
-          );
-        },
-        child: Text(dateRangeString, key: ValueKey<String>(dateRangeString)),
-      ),
-    );
-  }
-}
-
-Future<void> _selectRange(BuildContext context, WidgetRef ref) async {
-  final DateTimeRange? range = await showDateRangePicker(
-    context: context,
-    firstDate: DateTime(2020),
-    lastDate: DateTime(2030),
-    initialDateRange: DateTimeRange(
-      start: DateTime.now(),
-      end: DateTime.now().add(const Duration(days: 7)),
-    ),
-  );
-
-  if (range != null) {
-    ref.read(weekRangeProvider.notifier).newRange(range);
-  }
-}
