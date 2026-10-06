@@ -30,6 +30,7 @@ class Counter {
     String? icon,
     List<CounterEntry>? entries,
   }) => Counter(
+    id: id,
     name: name ?? this.name, 
     icon: icon ?? this.icon,
     entries: entries ?? this.entries

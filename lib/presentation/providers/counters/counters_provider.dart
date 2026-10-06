@@ -20,14 +20,18 @@ class Counters extends _$Counters {
 
     final counter = list.firstWhere((c) => c.id == counterId);
     final newCounterEntry = CounterEntry(dateTime: DateTime.now());
-    counter.entries.add(newCounterEntry);
+
+    final newEntriesList = [...counter.entries];
+    newEntriesList.add(newCounterEntry);
+    
+    final newCounter = counter.copyWith(entries: newEntriesList);
 
     //Llamar a la actualizacion en el datasource
     await repository.updateCounter(counter);
 
     state = AsyncData([
       for (final c in list)
-        if (c.id == counterId) counter else c
+        if (c.id == counterId) newCounter else c
     ]);
     
   }
@@ -51,13 +55,17 @@ class Counters extends _$Counters {
     //Tengo que encontrar el entry en la lista del counter, hacerle un copyWith, y reemplazar esa misma posicion por el nuevo
     final entryIndex = counter.entries.indexWhere((e) => e.id == previousEntry.id);
     final updatedEntry = previousEntry.copyWith(description: description, dateTime: dateTime);
-    counter.entries[entryIndex] = updatedEntry;
+    
+    final updatedEntries = [...counter.entries];
+    updatedEntries[entryIndex] = updatedEntry;
 
-    await repository.updateCounter(counter);
+    final updatedCounter = counter.copyWith(entries: updatedEntries); // ** Nuevo counter, necesario hacerlo asi para que riverpod lo detexte como un cambio de estado
+
+    await repository.updateCounter(updatedCounter);
 
     state = AsyncData([
       for (final c in state.value!)
-        if (c.id == counter.id) counter else c
+        if (c.id == counter.id) updatedCounter else c
     ]);
   }
 
