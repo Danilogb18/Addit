@@ -25,4 +25,9 @@ class CountersRepositoryImpl extends CountersRepositories {
     return datasource.createCounter(counter);
   }
 
+  @override
+  Future<void> deleteCounter(Counter counter) {
+    return datasource.deleteCounter(counter);
+  }
+
 }

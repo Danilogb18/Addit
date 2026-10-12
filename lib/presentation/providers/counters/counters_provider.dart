@@ -27,7 +27,7 @@ class Counters extends _$Counters {
     final newCounter = counter.copyWith(entries: newEntriesList);
 
     //Llamar a la actualizacion en el datasource
-    await repository.updateCounter(counter);
+    await repository.updateCounter(newCounter);
 
     state = AsyncData([
       for (final c in list)
@@ -45,6 +45,32 @@ class Counters extends _$Counters {
     await repository.createCounter(newCounter);
 
     state = AsyncData([...list, newCounter]);
+    ref.invalidateSelf();
+  }
+
+  Future<void> editCounter(String counterId, String name, String icon, List<CounterEntry> entries, String? description) async {
+    // si quiero editar, tengo que encontrar su indice en la lista y reemplazarlo por la nueva version. y luego en el repositorio simplemente actualizar el counter como cuando le cambian las entradas
+    final repository = ref.read(counterRepositoryProvider);
+    final list = state.value;
+    if (list == null) return;
+
+    final newCounter = Counter(id: counterId, name: name, icon: icon, entries: entries, description: description);
+    await repository.updateCounter(newCounter);
+
+    final List<Counter> newList = [];
+    for (var c in list) {
+      c.id == counterId ? newList.add(newCounter) : newList.add(c);
+    }
+    state = AsyncData([...newList]);
+    ref.invalidateSelf();
+  }
+
+  Future<void> deleteCounter(Counter counter) async {
+    final repository = ref.read(counterRepositoryProvider);
+    final list = state.value;
+    if (list == null) return;
+
+    await repository.deleteCounter(counter);
     ref.invalidateSelf();
   }
 
@@ -68,5 +94,26 @@ class Counters extends _$Counters {
         if (c.id == counter.id) updatedCounter else c
     ]);
   }
+
+  Future<void> deleteEntry(Counter counter, CounterEntry entry) async {
+  final repository = ref.read(counterRepositoryProvider);
+  final list = state.value;
+  if (list == null) return;
+
+  // Lista nueva, sin mutar la original
+  final newEntries = counter.entries
+      .where((element) => element.id != entry.id)
+      .toList();
+
+  final newCounter = counter.copyWith(entries: newEntries);
+
+  // Persistir el counter nuevo
+  await repository.updateCounter(newCounter);
+
+  state = AsyncData([
+    for (final c in list)
+      if (c.id == counter.id) newCounter else c
+  ]);
+}
 
 }

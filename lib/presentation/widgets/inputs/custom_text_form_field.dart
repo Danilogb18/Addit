@@ -9,6 +9,7 @@ class CustomTextFormField extends StatelessWidget {
   final String? error;
   final int? maxLength;
   final bool isObscure;
+  final String? initialValue;
 
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
@@ -22,7 +23,8 @@ class CustomTextFormField extends StatelessWidget {
     this.isObscure = false,
     this.onChanged,
     this.validator,
-    this.maxLength
+    this.maxLength,
+    this.initialValue
   });
 
 
@@ -40,6 +42,8 @@ class CustomTextFormField extends StatelessWidget {
 
 
     return TextFormField(
+      initialValue: initialValue,
+
       onChanged: onChanged,
 
       validator: validator,

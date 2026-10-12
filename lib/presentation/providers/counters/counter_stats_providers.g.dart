@@ -124,7 +124,7 @@ final class WeekRangeProvider
   }
 }
 
-String _$weekRangeHash() => r'9d66a5eca0f85c0aa33036e42531bae6eacce598';
+String _$weekRangeHash() => r'54f8dd8b3e156a044c14546259f596f469f51bae';
 
 abstract class _$WeekRange extends $Notifier<DateTimeRange<DateTime>> {
   DateTimeRange<DateTime> build();
@@ -339,3 +339,80 @@ final class ChartLabelsProvider
 }
 
 String _$chartLabelsHash() => r'418b2efa07d2518a960c8b633cd343bf1e0fe9ac';
+
+@ProviderFor(last7Days)
+final last7DaysProvider = Last7DaysFamily._();
+
+final class Last7DaysProvider
+    extends $FunctionalProvider<List<int>, List<int>, List<int>>
+    with $Provider<List<int>> {
+  Last7DaysProvider._({
+    required Last7DaysFamily super.from,
+    required List<CounterEntry> super.argument,
+  }) : super(
+         retry: null,
+         name: r'last7DaysProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$last7DaysHash();
+
+  @override
+  String toString() {
+    return r'last7DaysProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<List<int>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<int> create(Ref ref) {
+    final argument = this.argument as List<CounterEntry>;
+    return last7Days(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<int> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<int>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Last7DaysProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$last7DaysHash() => r'4990a9989928e4764eb8d7d0fbdb035d7f342c9b';
+
+final class Last7DaysFamily extends $Family
+    with $FunctionalFamilyOverride<List<int>, List<CounterEntry>> {
+  Last7DaysFamily._()
+    : super(
+        retry: null,
+        name: r'last7DaysProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  Last7DaysProvider call(List<CounterEntry> entries) =>
+      Last7DaysProvider._(argument: entries, from: this);
+
+  @override
+  String toString() => r'last7DaysProvider';
+}

@@ -12,11 +12,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Text('Bienvenido, Danilo', style: TextStyle(color: colors.onPrimary, fontSize: 25, fontWeight: FontWeight.w500),),
-        backgroundColor: colors.primary,
-      ),
+      appBar: CustomAppBar(title: 'Bienvenido, Danilo'),
       body: const _HomeView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -30,7 +26,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _HomeView extends ConsumerWidget {
-  const new();
+  const _HomeView();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,22 +34,35 @@ class _HomeView extends ConsumerWidget {
     final incrementFunction = ref.watch(countersProvider.notifier).increment;
 
     final textTheme = Theme.of(context).textTheme;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    final size = MediaQuery.of(context).size;
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
       child: counters.when(
         data: (data) {
-          return ListView.builder(
-            
-            itemCount: data.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) return Text('Tus contadores:', style: textTheme.titleLarge, textAlign: TextAlign.start,);
-              final currentCounter = data[index - 1];
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 5),
-                child: CounterCard(counter: currentCounter, incrementFunction: incrementFunction)
-              );
-            },
+          if (data.isEmpty) return const Center(child: Text('Aún no has creado ningún contador'),);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Tus contadores:', style: textTheme.titleLarge, textAlign: TextAlign.start,),
+              
+              Card(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final counter = data[index];
+                    return CounterCard(counter: counter, incrementFunction: incrementFunction);
+                  }, 
+                  separatorBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const Divider(),
+                  ), 
+                  itemCount: data.length
+                ),
+              ),
+              SizedBox(height: 100,)
+            ],
           );
         }, 
         error: (err, stackTrace) => Center(child: Text('Error: $err'),), 
