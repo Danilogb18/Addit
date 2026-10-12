@@ -10,4 +10,6 @@ abstract class CountersDatasource {
 
   Future<void> createCounter(Counter counter);
 
+  Future<void> deleteCounter(Counter counter);
+
 }

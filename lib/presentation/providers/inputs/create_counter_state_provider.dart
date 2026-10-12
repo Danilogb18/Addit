@@ -1,3 +1,4 @@
+import 'package:addit/domain/entities/counter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'create_counter_state_provider.g.dart';
@@ -29,8 +30,8 @@ class CreateCounterFormState {
   }) => CreateCounterFormState(
     name: name ?? this.name, 
     icon: icon ?? this.icon,
-    nameError: nameError, 
-    description: description
+    nameError: nameError ?? this.nameError, 
+    description: description ?? this.description
   );
 
 }
@@ -40,12 +41,25 @@ class CreateCounterFormState {
 class CreateCounterStateProvider extends _$CreateCounterStateProvider {
 
   @override
-  CreateCounterFormState build() => CreateCounterFormState(name: '', icon: '💯​'); //* Emoji por defecto
+  CreateCounterFormState build(Counter? counter) =>
+   CreateCounterFormState(
+    name: counter?.name ?? '', 
+    description: counter?.description ?? '',
+    icon: counter?.icon ?? '💯​'
+  ); //* Emoji por defecto
 
   void nameChanged (String value) {
-    String? error;
-    if (value.isEmpty || value.trim().isEmpty) error = 'Campo obligatorio';
-    state = state.copyWith(name: value, nameError: error);
+    final error = value.trim().isEmpty ? 'Campo obligatorio' : null;
+    state = CreateCounterFormState( // en este caso uso constructor en vez del copywith porque si el error es nulo, el copywith detecta como que no lo enviaron y no sobreescribe el error anterior. aqui es mas explicito
+      name: value,
+      icon: state.icon,
+      description: state.description,
+      nameError: error,
+    );
+  }
+
+  void descriptionChanged (String value) {
+    state = state.copyWith(description: value);
   }
 
   void iconChanged (String value) {
@@ -53,8 +67,10 @@ class CreateCounterStateProvider extends _$CreateCounterStateProvider {
     state = state.copyWith(icon: value);
   }
 
+
   bool validateForm () {
     nameChanged(state.name); 
+    print(state.nameError);
     return state.isValid;
   }
 

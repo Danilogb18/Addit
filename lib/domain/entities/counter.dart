@@ -28,12 +28,21 @@ class Counter {
   Counter copyWith ({
     String? name,
     String? icon,
+    String? description,
     List<CounterEntry>? entries,
   }) => Counter(
     id: id,
     name: name ?? this.name, 
+    description: description ?? this.description,
     icon: icon ?? this.icon,
     entries: entries ?? this.entries
   );
+
+    List<CounterEntry> get entriesByDateDesc => [...entries]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
+    CounterEntry? get latestEntry {
+      if (entries.isEmpty) return null;
+      return entries.reduce((a, b) => a.dateTime.isAfter(b.dateTime) ? a : b);
+    }
 
 }

@@ -8,6 +8,7 @@ import 'package:addit/presentation/widgets/widgets.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CounterInfoScreen extends ConsumerWidget {
 
@@ -54,8 +55,7 @@ class _CounterInfoView extends ConsumerWidget {
     //final colors = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
 
-    final counterEntriesOrdered = [...counter.entries]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
-
+    final counterEntriesOrdered = counter.entriesByDateDesc;
     return SingleChildScrollView(
       padding: EdgeInsets.only(
         top:  MediaQuery.of(context).padding.top, //para no ocultar el contenido por detras del appbar degradado
@@ -89,35 +89,38 @@ class _CounterInfoView extends ConsumerWidget {
               const SizedBox(height: 5,),
       
               Card(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  child: Column( // ** Trabajo con una column generando con un for en vez de un ListView.separated , para que el key sirva para detectar una nueva entry agregada y que se anime solamente la nueva creada
-                    children: [
-                      for (int i = 0; i < counterEntriesOrdered.length; i++) ...[
-                        if (i > 0) const Divider(),
-                        Builder(
-                          key: ValueKey(counterEntriesOrdered[i].id),
-                          builder: (context) {
-                            final counterEntry = counterEntriesOrdered[i];
-                            return FadeInRight(
-                              child: ListTile(
-                                horizontalTitleGap: 8,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                                visualDensity: const VisualDensity(vertical: -3),
-                                leading: Text(counter.icon, style: textTheme.titleLarge),
-                                title: _EntryDescription(counterEntry: counterEntry, textTheme: textTheme),
-                                subtitle: Text(HumanFormats.formatDate(counterEntry.dateTime)),
-                                trailing: const Icon(Icons.keyboard_arrow_right, size: 30),
-                                onTap: () => _showEditEntrySheet(context, ref, counter, counterEntry),
-                              ),
-                            );
-                          },
-                        ),
+                child: 
+                  counterEntriesOrdered.isEmpty 
+                  ? SizedBox(width: double.infinity, height: 50, child: Center(child: const Text('Aún no hay entradas para este contador')))
+                  : Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    child: Column( // ** Trabajo con una column generando con un for en vez de un ListView.separated , para que el key sirva para detectar una nueva entry agregada y que se anime solamente la nueva creada
+                      children: [
+                        for (int i = 0; i < counterEntriesOrdered.length; i++) ...[
+                          if (i > 0) const Divider(),
+                          Builder(
+                            key: ValueKey(counterEntriesOrdered[i].id),
+                            builder: (context) {
+                              final counterEntry = counterEntriesOrdered[i];
+                              return FadeInRight(
+                                child: ListTile(
+                                  horizontalTitleGap: 8,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                                  visualDensity: const VisualDensity(vertical: -3),
+                                  leading: Text(counter.icon, style: textTheme.titleLarge),
+                                  title: _EntryDescription(counterEntry: counterEntry, textTheme: textTheme),
+                                  subtitle: Text(HumanFormats.formatDate(counterEntry.dateTime)),
+                                  trailing: const Icon(Icons.keyboard_arrow_right, size: 30),
+                                  onTap: () => _showEditEntrySheet(context, ref, counter, counterEntry),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
 
               const SizedBox(height: 100,)
       
@@ -218,7 +221,12 @@ class _CounterIconAndTitle extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(counter.name, style: textTheme.headlineSmall,),
-                Text('Total hasta la fecha: ${counter.count}', style: textTheme.bodyMedium?.copyWith(color: colors.outline),)
+                Text('Total hasta la fecha: ${counter.count}', style: textTheme.bodyMedium?.copyWith(color: colors.outline),),
+                SizedBox(height: 5,),
+                GestureDetector(
+                  onTap: () => context.push('edit-counter/${counter.id}'),
+                  child: Text('Editar', style: textTheme.labelLarge?.copyWith(color: colors.primary),)
+                )
               ],
             ),
           )
@@ -231,6 +239,7 @@ class _CounterIconAndTitle extends StatelessWidget {
 
 Future<void> _showEditEntrySheet(BuildContext context, WidgetRef ref, Counter counter, CounterEntry entry) async {
   final descriptionController = TextEditingController(text: entry.description);
+  final colors = Theme.of(context).colorScheme;
   DateTime selectedDateTime = entry.dateTime;
 
   final result = await showModalBottomSheet<CounterEntry>(
@@ -308,6 +317,10 @@ Future<void> _showEditEntrySheet(BuildContext context, WidgetRef ref, Counter co
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(colors.surfaceBright),
+                      foregroundColor: WidgetStatePropertyAll(colors.primary)
+                    ),
                     onPressed: () {
                       Navigator.pop(
                         context,
@@ -318,6 +331,17 @@ Future<void> _showEditEntrySheet(BuildContext context, WidgetRef ref, Counter co
                       );
                     },
                     child: const Text('Guardar'),
+                  ),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(colors.onError),
+                      foregroundColor: WidgetStatePropertyAll(colors.error)
+                    ),
+                    onPressed: () {
+                      ref.read(countersProvider.notifier).deleteEntry(counter, entry);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Eliminar entrada'),
                   ),
                 ],
               );

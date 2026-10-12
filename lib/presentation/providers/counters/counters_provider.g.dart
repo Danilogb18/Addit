@@ -33,7 +33,7 @@ final class CountersProvider
   Counters create() => Counters();
 }
 
-String _$countersHash() => r'16f8b61169d06ca65761e23cb91527196e2deb31';
+String _$countersHash() => r'52083a18a2dcf8c3c090230970a7089863c5d8a7';
 
 abstract class _$Counters extends $AsyncNotifier<List<Counter>> {
   FutureOr<List<Counter>> build();

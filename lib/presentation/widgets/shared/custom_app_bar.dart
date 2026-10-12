@@ -15,7 +15,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   Widget build(BuildContext context) {
     final bg = Theme.of(context).scaffoldBackgroundColor;
     final barHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
-    final totalHeight = barHeight + 40;
+    final totalHeight = barHeight + 30;
 
     return Stack(
       clipBehavior: Clip.none,

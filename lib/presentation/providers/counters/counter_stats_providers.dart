@@ -161,6 +161,17 @@ ChartAxis chartLabels(Ref ref) {
   return ChartAxis(List.filled(count, ''), tooltips, LabelMode.all);
 }
 
+@riverpod
+List<int> last7Days(Ref ref, List<CounterEntry> entries) { //obtener simplemente lo ultimos 7 dias, sin preocuparse porque sea la semana completa
+  final today = DateUtils.dateOnly(DateTime.now());
+  final counts = List.filled(7, 0);
+  for (final e in entries) {
+    final diff = today.difference(DateUtils.dateOnly(e.dateTime)).inDays;
+    if (diff >= 0 && diff < 7) counts[6 - diff]++;
+  }
+  return counts;
+}
+
 
 // ** Lo de abajo son métodos que sirven para obtener el listado de conteos por semana
 DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);

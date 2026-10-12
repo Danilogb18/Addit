@@ -78,5 +78,14 @@ class HumanFormats {
     final dayAfterEnd = DateTime(bucket.end.year, bucket.end.month, bucket.end.day + 1);
     return bucket.start.day == 1 && dayAfterEnd.day == 1;
   }
-
+  
+  static String relativeDay(DateTime date) {
+    final diff = DateUtils.dateOnly(DateTime.now())
+        .difference(DateUtils.dateOnly(date))
+        .inDays;
+    if (diff == 0) return 'Hoy';
+    if (diff == 1) return 'Ayer';
+    if (diff > 1 && diff < 7) return 'Hace $diff días';
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }

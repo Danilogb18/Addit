@@ -22,7 +22,8 @@ List<Counter> mockupCounterList = [
     entries: [
       CounterEntry(dateTime: DateTime.now(), description: 'Karfels, karfels'),
       ...generateEntries()
-    ]
+    ],
+    description: 'Hamburguesas comidas ya tu sae'
   )
 ];
 
@@ -46,5 +47,12 @@ class MockupCounterDatasource extends CountersDatasource {
   Future<void> createCounter(Counter counter) async {
     mockupCounterList.add(counter);
   }
+
+  @override
+  Future<void> deleteCounter(Counter counter) async {
+    mockupCounterList.removeWhere((element) => element.id == counter.id,);
+  }
+
+  
 
 }
