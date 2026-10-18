@@ -89,12 +89,12 @@ dart run build_runner build --delete-conflicting-outputs
 
 - [x] Counters and entries
 - [x] Stats by week, month, 6 months, and year
-- [ ] Full persistence with Drift
-- [ ] Edit and delete entries
+- [x] Full persistence with Drift
+- [x] Edit and delete entries
 - [ ] Data export
 
 ## 👤 Author
 
 Made by **Danilo**, a student at ESPOL.
 
-[GitHub](https://github.com/YOUR_USERNAME)
+[GitHub](https://github.com/Danilogb18)
